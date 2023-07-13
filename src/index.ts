@@ -1,8 +1,11 @@
+// the order matters because of import dependencies
 
-export * from './index.v1'
+export * from './manager';
+export * from './server';
+export * from './user';
+export * from './helper';
+export * from './resource';
+export * from './Errors';
 
-import * as v1 from './index.v1'
-export { v1 }
-
-import * as v2 from './index.v2'
-export { v2 }
+import * as extensions from './extensions';
+export { extensions };

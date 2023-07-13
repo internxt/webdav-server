@@ -1,7 +1,8 @@
 node_modules
 *.log
-test/v2/tests
+test/tests
 experiment
 package-lock.json
 yarn.lock
 /lib/
+.npmrc

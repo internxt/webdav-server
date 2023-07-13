@@ -26,33 +26,31 @@
     "build": "cd src && tsc --declaration",
     "lint": "tslint --project tslint.json src/**/v2/**/*.ts",
     "test": "npm run build-test && npm run start-test",
-    "start-test": "node test/v2/root.js && node test/v1/root.js",
-    "build-test": "cd test/v2/tests.ts && tsc"
+    "start-test": "node test/root.js",
+    "build-test": "cd test/tests.ts && tsc"
   },
-  "name": "webdav-server",
-  "version": "2.6.2",
-  "author": "Adrien Castex <adrien.castex@protonmail.com>",
+  "name": "@internxt/webdav-server",
+  "version": "1.0.0",
+  "author": "Internxt <hello@internxt.com>",
   "license": "Unlicense",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenMarshal/npm-WebDAV-Server.git"
+    "url": "https://github.com/internxt/webdav-server.git"
   },
-  "description": "WebDAV Server",
+  "description": "Internxt Webdav server",
   "dependencies": {
     "mime-types": "^2.1.18",
     "xml-js-builder": "^1.0.3"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.0",
-    "@types/node": "^7.0.64",
-    "@types/request": "0.0.44",
+    "@types/node": "^12.20.55",
     "express": "^4.16.4",
     "form-data": "^3.0.0",
     "request": "^2.85.0",
     "safe-regex": "^1.1.0",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.2",
-    "webdav-fs": "^1.10.1",
+    "typescript": "^5.1.6",
     "xml-js": "^1.4.1"
   },
   "types": "./lib/index.d.ts"
