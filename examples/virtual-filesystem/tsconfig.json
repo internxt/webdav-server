@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "moduleResolution": "NodeNext",
+    "outDir": "./lib",
+    "typeRoots": ["node_modules/@types"],
+    "target": "ES5",
+    "types": ["node"]
+  }
+}
