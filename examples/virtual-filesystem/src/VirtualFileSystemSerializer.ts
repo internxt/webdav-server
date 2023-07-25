@@ -38,10 +38,11 @@ export class VirtualFilesystemSerializer
       if (e) return callback(e);
 
       if (!fs) return callback(new Error('No FileSystem to unserialize found'));
-      for (const path in serializedData.resources)
+      for (const path in serializedData.resources) {
         fs.resources[path] = new VirtualResource(
           serializedData.resources[path]
         );
+      }
 
       callback(undefined, fs);
     });

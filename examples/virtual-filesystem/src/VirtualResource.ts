@@ -1,4 +1,5 @@
 import * as Webdav from '../../../src';
+import { logger } from './utils';
 
 export class VirtualResource {
   type: Webdav.ResourceType;
@@ -6,26 +7,18 @@ export class VirtualResource {
   lockManager: Webdav.LocalLockManager;
   creationDate: number;
   lastModifiedDate: number;
-  contentUID?: string;
+  uid?: string;
 
-  constructor(data: VirtualResource | Webdav.ResourceType) {
-    if (data.constructor === Webdav.ResourceType) {
-      this.type = data as Webdav.ResourceType;
-      this.propertyManager = new Webdav.LocalPropertyManager();
-      this.creationDate = Date.now();
-      this.lastModifiedDate = this.creationDate;
-      this.contentUID = undefined;
-    } else {
-      const resource = data as VirtualResource;
+  constructor(data: Partial<VirtualResource>) {
+    this.type = data.type;
+    this.propertyManager = new Webdav.LocalPropertyManager(
+      data.propertyManager
+    );
 
-      this.type = resource.type;
-      this.propertyManager = new Webdav.LocalPropertyManager(
-        resource.propertyManager
-      );
-      this.creationDate = resource.creationDate;
-      this.lastModifiedDate = resource.lastModifiedDate;
-      this.contentUID = resource.contentUID;
-    }
+    this.creationDate = data.creationDate ?? Date.now();
+    this.lastModifiedDate = data.lastModifiedDate ?? this.creationDate;
+
+    this.uid = data.uid;
 
     this.lockManager = new Webdav.LocalLockManager();
   }

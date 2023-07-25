@@ -15,7 +15,9 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     super(new VirtualFilesystemSerializer());
 
     this.resources = {
-      '/': new VirtualResource(Webdav.ResourceType.Directory),
+      '/': new VirtualResource({
+        type: Webdav.ResourceType.Directory,
+      }),
     };
   }
 
@@ -38,13 +40,14 @@ export class VirtualFileSystem extends Webdav.FileSystem {
       } resource at ${path.toString()}`
     );
 
-    let resource = this.resources[path.toString()];
+    const resource = this.resources[path.toString()];
     if (resource) return callback(Webdav.Errors.ResourceAlreadyExists);
 
-    resource = new VirtualResource(ctx.type);
-    const id = this.allocator.allocate(path.fileName());
-    resource.contentUID = id;
-    this.resources[path.toString()] = resource;
+    this.resources[path.toString()] = new VirtualResource({
+      type: ctx.type,
+      uid: this.allocator.allocate(),
+    });
+
     callback();
   }
 
@@ -57,7 +60,7 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     const resource = this.resources[path.toString()];
     if (!resource) return callback(Webdav.Errors.ResourceNotFound);
 
-    this.allocator.free(resource.contentUID);
+    this.allocator.free(resource.uid);
     delete this.resources[path.toString()];
     callback();
   }
@@ -70,7 +73,7 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     const resource = this.resources[path.toString()];
     if (!resource) return callback(Webdav.Errors.ResourceNotFound);
 
-    callback(undefined, this.allocator.writeStream(resource.contentUID));
+    callback(undefined, this.allocator.writeStream(resource.uid));
   }
 
   protected _openReadStream(
@@ -78,10 +81,11 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     ctx: Webdav.OpenReadStreamInfo,
     callback: Webdav.ReturnCallback<Readable>
   ): void {
-    logger.info(`Opening read stream for file at ${path.toString()}`);
+    //logger.info(`Opening read stream for file at ${path.toString()}`);
+
     const resource = this.resources[path.toString()];
     if (!resource) return callback(Webdav.Errors.ResourceNotFound);
-    callback(undefined, this.allocator.readStream(resource.contentUID));
+    callback(undefined, this.allocator.readStream(resource.uid));
   }
 
   protected _lockManager(
@@ -103,6 +107,30 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     if (!resource) return callback(Webdav.Errors.ResourceNotFound);
     callback(undefined, resource.propertyManager);
   }
+
+  /*   protected _move(
+    pathFrom: Webdav.Path,
+    pathTo: Webdav.Path,
+    ctx: Webdav.MoveInfo,
+    callback: Webdav.ReturnCallback<boolean>
+  ): void {
+    const resource = this.resources[pathFrom.toString()];
+
+    if (!resource) return callback(Webdav.Errors.ResourceNotFound);
+
+    this.resources[pathTo.toString()] = new VirtualResource({
+      type: resource.type,
+      uid: resource.uid,
+      lastModifiedDate: resource.lastModifiedDate,
+      creationDate: resource.creationDate,
+      lockManager: resource.lockManager,
+      propertyManager: resource.propertyManager,
+    });
+
+    delete this.resources[pathFrom.toString()];
+
+    callback(undefined, true);
+  } */
 
   protected _readDir(
     path: Webdav.Path,
@@ -160,8 +188,13 @@ export class VirtualFileSystem extends Webdav.FileSystem {
   ): void {
     const resource = this.resources[path.toString()];
     if (!resource) return callback(Webdav.Errors.ResourceNotFound);
-    const stats = this.allocator.getStats(resource.contentUID);
 
+    if (resource.type === Webdav.ResourceType.Directory) {
+      return callback(undefined, undefined);
+    }
+
+    const stats = this.allocator.getStats(resource.uid);
+    if (!stats) return callback(undefined, undefined);
     return callback(undefined, stats.size);
   }
 }

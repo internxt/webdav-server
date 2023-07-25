@@ -7,7 +7,11 @@ import { logger } from './src/utils';
 import { exec } from 'child_process';
 import { homedir } from 'os';
 import { xml2json } from 'xml-js';
-import { DEBUG_WEBDAV_METHODS, ENABLE_DEBUG_WEBDAV_REQUESTS } from './config';
+import {
+  DEBUG_WEBDAV_METHODS,
+  ENABLE_DEBUG_WEBDAV_REQUESTS,
+  ENABLE_LOG_BODY,
+} from './config';
 import { VirtualFileSystem } from './src/VirtualFileSystem';
 import { VirtualResourceAllocator } from './src/VirtualResourceAllocator';
 const serializer = new VirtualFilesystemSerializer();
@@ -73,12 +77,14 @@ if (ENABLE_DEBUG_WEBDAV_REQUESTS) {
         `[${ctx.request.method}] ${ctx.response.statusCode} ${
           ctx.request.url
         } ${
-          ctx.responseBody
-            ? xml2json(ctx.responseBody, {
-                spaces: 4,
-                compact: true,
-              })
-            : 'NO_BODY'
+          ENABLE_LOG_BODY
+            ? ctx.responseBody
+              ? xml2json(ctx.responseBody, {
+                  spaces: 4,
+                  compact: true,
+                })
+              : 'NO_BODY'
+            : ''
         }`
       );
     }
@@ -106,9 +112,7 @@ server.start((s) => {
   logger.info(`Virtual filesystem ready at ${addressInfo.port}`);
 
   logger.info('Mounting webdav');
-  server.autoLoadAsync().catch((error) => {
-    logger.error('Autoload failed: ', error);
-  });
+
   exec(
     `mount_webdav -v 'Virtual FS' http://localhost:${addressInfo.port} ${webdavFolderPath}`,
     (error) => {

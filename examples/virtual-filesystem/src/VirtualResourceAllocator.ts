@@ -7,36 +7,54 @@ import * as fs from 'fs';
 import { logger } from './utils';
 import * as crypto from 'crypto';
 export class VirtualResourceAllocator {
+  private currentUID: number = 0;
   constructor(public folderPath: string) {}
 
   initialize(callback: Webdav.SimpleCallback): void {
     logger.info('Initializing VirtualResourceAllocator');
+    fs.readdir(this.folderPath, (e, files) => {
+      if (e) return callback(e);
+
+      files.forEach((file) => {
+        const id = parseInt(file);
+        if (!isNaN(id) && this.currentUID < id) {
+          logger.info('FILE', file);
+          this.currentUID = id;
+        }
+      });
+
+      callback();
+    });
     callback();
   }
 
-  allocate(name: string): string {
-    return name;
+  allocate(): string {
+    return (++this.currentUID).toString(16);
   }
 
-  free(name: string): void {
-    if (fs.existsSync(this.fullPath(name))) {
-      fs.unlinkSync(this.fullPath(name));
+  free(uid: string): void {
+    if (fs.existsSync(this.fullPath(uid))) {
+      fs.unlinkSync(this.fullPath(uid));
     }
   }
 
-  fullPath(name: string): string {
-    return path.join(this.folderPath, name);
+  fullPath(uid: string): string {
+    return path.join(this.folderPath, uid);
   }
 
-  readStream(name: string): Readable {
-    return fs.createReadStream(this.fullPath(name));
+  readStream(uid: string): Readable {
+    return fs.createReadStream(this.fullPath(uid));
   }
 
-  writeStream(name: string): Writable {
-    return fs.createWriteStream(this.fullPath(name));
+  writeStream(uid: string): Writable {
+    return fs.createWriteStream(this.fullPath(uid));
   }
 
   getStats(name: string) {
-    return fs.statSync(this.fullPath(name));
+    try {
+      return fs.statSync(this.fullPath(name));
+    } catch {
+      return null;
+    }
   }
 }
