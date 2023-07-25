@@ -15,9 +15,7 @@ export class VirtualResourceAllocator {
   }
 
   allocate(name: string): string {
-    const hash = crypto.createHash('sha256');
-    hash.update(name);
-    return hash.digest().toString('hex').slice(0, 16);
+    return name;
   }
 
   free(name: string): void {
@@ -36,5 +34,9 @@ export class VirtualResourceAllocator {
 
   writeStream(name: string): Writable {
     return fs.createWriteStream(this.fullPath(name));
+  }
+
+  getStats(name: string) {
+    return fs.statSync(this.fullPath(name));
   }
 }

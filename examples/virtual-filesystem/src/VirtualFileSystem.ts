@@ -72,15 +72,15 @@ export class VirtualFileSystem extends Webdav.FileSystem {
 
     callback(undefined, this.allocator.writeStream(resource.contentUID));
   }
-  protected _openReadStream?(
+
+  protected _openReadStream(
     path: Webdav.Path,
     ctx: Webdav.OpenReadStreamInfo,
     callback: Webdav.ReturnCallback<Readable>
   ): void {
+    logger.info(`Opening read stream for file at ${path.toString()}`);
     const resource = this.resources[path.toString()];
-    if (!resource || !resource.contentUID)
-      return callback(Webdav.Errors.ResourceNotFound);
-
+    if (!resource) return callback(Webdav.Errors.ResourceNotFound);
     callback(undefined, this.allocator.readStream(resource.contentUID));
   }
 
@@ -151,5 +151,17 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     const resource = this.resources[path.toString()];
     if (!resource) return callback(Webdav.Errors.ResourceNotFound);
     callback(undefined, resource.type);
+  }
+
+  protected _size(
+    path: Webdav.Path,
+    ctx: Webdav.SizeInfo,
+    callback: Webdav.ReturnCallback<number>
+  ): void {
+    const resource = this.resources[path.toString()];
+    if (!resource) return callback(Webdav.Errors.ResourceNotFound);
+    const stats = this.allocator.getStats(resource.contentUID);
+
+    return callback(undefined, stats.size);
   }
 }
