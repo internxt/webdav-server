@@ -42,7 +42,7 @@ export class VirtualFileSystem extends Webdav.FileSystem {
     if (resource) return callback(Webdav.Errors.ResourceAlreadyExists);
 
     resource = new VirtualResource(ctx.type);
-    const id = this.allocator.allocate();
+    const id = this.allocator.allocate(path.fileName());
     resource.contentUID = id;
     this.resources[path.toString()] = resource;
     callback();

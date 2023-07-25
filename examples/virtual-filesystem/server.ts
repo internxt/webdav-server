@@ -22,9 +22,13 @@ const server = new Webdav.WebDAVServer({
   rootFileSystem: new VirtualFileSystem(new VirtualResourceAllocator(vsfsPath)),
   port: 1901,
   autoSave: {
+    onSaveError: (error) => {
+      logger.error('Error saving server state: ', error);
+    },
     treeFilePath: path.resolve('./data/state'),
   },
   autoLoad: {
+    serializers: [serializer],
     treeFilePath: path.resolve('./data/state'),
   },
 });
@@ -102,6 +106,9 @@ server.start((s) => {
   logger.info(`Virtual filesystem ready at ${addressInfo.port}`);
 
   logger.info('Mounting webdav');
+  server.autoLoadAsync().catch((error) => {
+    logger.error('Autoload failed: ', error);
+  });
   exec(
     `mount_webdav -v 'Virtual FS' http://localhost:${addressInfo.port} ${webdavFolderPath}`,
     (error) => {

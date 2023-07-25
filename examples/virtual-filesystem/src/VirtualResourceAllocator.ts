@@ -5,31 +5,19 @@ import { Readable, Writable } from 'stream';
 import * as path from 'path';
 import * as fs from 'fs';
 import { logger } from './utils';
-
+import * as crypto from 'crypto';
 export class VirtualResourceAllocator {
-  currentUID: number;
-
-  constructor(public folderPath: string) {
-    this.currentUID = 0;
-  }
+  constructor(public folderPath: string) {}
 
   initialize(callback: Webdav.SimpleCallback): void {
     logger.info('Initializing VirtualResourceAllocator');
-    fs.readdir(this.folderPath, (e, files) => {
-      if (e) return callback(e);
-
-      files.forEach((file) => {
-        const id = parseInt(file);
-        if (!isNaN(id) && this.currentUID < id) this.currentUID = id;
-      });
-
-      logger.info('VirtualResourceAllocator initialized');
-      callback();
-    });
+    callback();
   }
 
-  allocate(): string {
-    return (++this.currentUID).toString(16);
+  allocate(name: string): string {
+    const hash = crypto.createHash('sha256');
+    hash.update(name);
+    return hash.digest().toString('hex').slice(0, 16);
   }
 
   free(name: string): void {

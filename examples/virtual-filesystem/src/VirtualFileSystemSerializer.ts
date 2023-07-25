@@ -3,6 +3,7 @@ import * as Webdav from '../../../src';
 import { VirtualFileSystem } from './VirtualFileSystem';
 import { VirtualResourceAllocator } from './VirtualResourceAllocator';
 import { VirtualResource } from './VirtualResource';
+import { logger } from './utils';
 
 export interface VirtualFileSystemSerializedData {
   path: string;
@@ -32,6 +33,7 @@ export class VirtualFilesystemSerializer
     serializedData: VirtualFileSystemSerializedData,
     callback: Webdav.ReturnCallback<VirtualFileSystem>
   ): void {
+    logger.info('Unserializing filesystem');
     this.createNewFileSystem(serializedData.path, (e, fs) => {
       if (e) return callback(e);
 
