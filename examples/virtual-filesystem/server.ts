@@ -32,7 +32,7 @@ const server = new Webdav.WebDAVServer({
 const vsfsPathExists = fs.existsSync(vsfsPath);
 
 if (!vsfsPathExists) {
-  fs.mkdir(vsfsPath, (e) => {
+  fs.mkdir(vsfsPath, { recursive: true }, (e) => {
     if (e) throw e;
 
     serializer.createNewFileSystem(vsfsPath, (e, vsfs) => {
@@ -54,7 +54,7 @@ if (!vsfsPathExists) {
 }
 
 if (!fs.existsSync(webdavFolderPath)) {
-  fs.mkdirSync(webdavFolderPath);
+  fs.mkdirSync(webdavFolderPath, { recursive: true });
 }
 
 if (ENABLE_DEBUG_WEBDAV_REQUESTS) {
