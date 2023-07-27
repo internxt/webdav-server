@@ -49,7 +49,7 @@ export class PhysicalSerializer implements FileSystemSerializer {
   }
 
   serialize(fs: PhysicalFileSystem, callback: ReturnCallback<any>): void {
-    callback(null, {
+    callback(undefined, {
       resources: fs.resources,
       rootPath: fs.rootPath,
     });
@@ -59,7 +59,7 @@ export class PhysicalSerializer implements FileSystemSerializer {
     // tslint:disable-next-line:no-use-before-declare
     const fs = new PhysicalFileSystem(serializedData.rootPath);
     fs.resources = serializedData.resources;
-    callback(null, fs);
+    callback(undefined, fs);
   }
 }
 
@@ -180,7 +180,7 @@ export class PhysicalFileSystem extends FileSystem {
       if (!resource)
         this.resources[path.toString()] = new PhysicalFileSystemResource();
 
-      callback(null, fs.createWriteStream(null, { fd }));
+      callback(undefined, fs.createWriteStream(null, { fd }));
     });
   }
 
@@ -194,7 +194,7 @@ export class PhysicalFileSystem extends FileSystem {
     fs.open(realPath, 'r', (e, fd) => {
       if (e) return callback(Errors.ResourceNotFound);
 
-      callback(null, fs.createReadStream(null, { fd }));
+      callback(undefined, fs.createReadStream(null, { fd }));
     });
   }
 
@@ -213,7 +213,7 @@ export class PhysicalFileSystem extends FileSystem {
 
         this.resources[realPathTo] = this.resources[realPathFrom];
         delete this.resources[realPathFrom];
-        callback(null, overwritten);
+        callback(undefined, overwritten);
       });
     };
 
@@ -261,7 +261,7 @@ export class PhysicalFileSystem extends FileSystem {
       this.resources[path.toString()] = resource;
     }
 
-    callback(null, resource[propertyName]);
+    callback(undefined, resource[propertyName]);
   }
 
   protected _lockManager(
@@ -303,7 +303,7 @@ export class PhysicalFileSystem extends FileSystem {
     fs.stat(realPath, (e, stat) => {
       if (e) return callback(Errors.ResourceNotFound);
 
-      callback(null, stat[propertyName]);
+      callback(undefined, stat[propertyName]);
     });
   }
   protected getStatDateProperty(

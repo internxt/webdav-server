@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "dev": "nodemon --signal SIGHUP server.ts"
+  },
+  "name": "virtual-fs",
+  "version": "1.0.0",
+  "author": "Internxt <hello@internxt.com>",
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/internxt/webdav-server.git"
+  },
+  "dependencies": {
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "@types/node": "^12.20.55",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1"
+  }
+}
